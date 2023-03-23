@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-type QueryFunction<T> = () => Promise<any>;
-type QueryResult<T, R> = {
+type QueryFunction = () => Promise<any>;
+type QueryResult<R> = {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
@@ -9,7 +9,7 @@ type QueryResult<T, R> = {
   error: Error | null;
 };
 
-function useQuery<T, R>(queryFunction: QueryFunction<R>): QueryResult<T, R> {
+function useQuery<R>(queryFunction: QueryFunction): QueryResult<R> {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);

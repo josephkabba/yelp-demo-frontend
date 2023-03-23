@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Restaurant } from "../api/restaurants";
+import { useNavigate } from "react-router-dom";
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -14,19 +15,17 @@ interface RestaurantCardProps {
 const RestaurantCard: React.FC<RestaurantCardProps> = ({
   restaurant,
 }: RestaurantCardProps) => {
-  const {
-    id,
-    name,
-    location,
-    image_url,
-    review_count,
-    rating,
-    phone,
-  } = restaurant;
+  const navigate = useNavigate();
+  const { id, name, location, image_url, review_count, rating, phone } =
+    restaurant;
+
+  const onClick = () => {
+    navigate(`/${id}`);
+  };
 
   return (
     <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea>
+      <CardActionArea onClick={onClick}>
         <CardMedia component="img" height="140" image={image_url} alt={name} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">

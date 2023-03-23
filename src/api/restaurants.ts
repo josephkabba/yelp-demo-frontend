@@ -23,6 +23,7 @@ interface Location {
   state: string;
   zip: string;
 }
+
 export type SearchRestaurantsQueryParams = {
   term: string;
   location: string;

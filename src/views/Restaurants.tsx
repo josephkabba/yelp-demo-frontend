@@ -1,26 +1,26 @@
 import { LoadingButton } from "@mui/lab";
-import {
-  Alert,
-  AlertTitle,
-  Divider,
-  Grid,
-  Snackbar,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Alert, Grid, Stack, TextField, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { zodResolver } from "@hookform/resolvers/zod";
 import useMutation from "../hooks/useMutation";
 import {
   Restaurant,
   SearchRestaurantsQueryParams,
   searchRestaurants,
 } from "../api/restaurants";
-import { useGeolocated } from "react-geolocated";
-import { useEffect, useState } from "react";
 import RestaurantCard from "../components/RestaurantCard";
+import { TypeOf, object, string } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import Message from "../components/Message";
 
-const Restaurants = () => {
+const FormInputSchema = object({
+  location: string().min(1, "Location is required"),
+  term: string().min(1, "Search term is required"),
+});
+
+type FormInputData = TypeOf<typeof FormInputSchema>;
+
+const Restaurants = (): JSX.Element => {
   const { error, isLoading, isError, data, mutate } = useMutation<
     SearchRestaurantsQueryParams,
     Restaurant[]
@@ -28,54 +28,82 @@ const Restaurants = () => {
     return searchRestaurants(data);
   });
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const { handleSubmit, control } = useForm<FormInputData>({
+    resolver: zodResolver(FormInputSchema),
+  });
 
-  const { coords, isGeolocationAvailable, isGeolocationEnabled, getPosition } =
-    useGeolocated({
-      positionOptions: {
-        enableHighAccuracy: false,
-      },
-      userDecisionTimeout: 5000,
+  const onSubmit = (data: FormInputData) => {
+    const { location, term } = data;
+    mutate({
+      term: term.toLocaleLowerCase(),
+      location: location.toLocaleLowerCase(),
     });
-
-  const setText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setSearchTerm(value);
   };
-
-  const onclick = () => {
-    if (!isGeolocationEnabled) {
-      getPosition();
-      return;
-    }
-
-    mutate({ term: searchTerm, location: "new york" });
-  };
-
-  useEffect(() => {
-    if (!isGeolocationEnabled) {
-      getPosition();
-    }
-  }, []);
 
   return (
     <Stack>
       <Stack
-        direction="row"
+        direction={{ xs: "column", sm: "column", md: "row" }}
         justifyContent="center"
         spacing={2}
+        onSubmit={handleSubmit(onSubmit)}
+        component="form"
         sx={{ padding: 2 }}
       >
-        <TextField
-          label="Search..."
-          onChange={setText}
-          id="search"
-          variant="outlined"
+        <Controller
+          render={({
+            field: { onChange, onBlur, value, name, ref },
+            fieldState: { error },
+          }) => (
+            <TextField
+              required
+              type="text"
+              autoComplete="text"
+              label="Enter location"
+              error={Boolean(error?.message)}
+              helperText={error?.message}
+              name={name}
+              autoFocus
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              inputRef={ref}
+            />
+          )}
+          name="location"
+          control={control}
+          defaultValue=""
+          rules={{ required: true }}
+        />
+        <Controller
+          render={({
+            field: { onChange, onBlur, value, name, ref },
+            fieldState: { error },
+          }) => (
+            <TextField
+              required
+              type="text"
+              autoComplete="text"
+              label="Enter search term"
+              error={Boolean(error?.message)}
+              helperText={error?.message}
+              name={name}
+              autoFocus
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              inputRef={ref}
+            />
+          )}
+          name="term"
+          control={control}
+          defaultValue=""
+          rules={{ required: true }}
         />
         <LoadingButton
           loading={isLoading}
           variant="contained"
-          onClick={onclick}
+          type="submit"
           startIcon={<SearchIcon />}
         >
           Search
@@ -105,15 +133,9 @@ const Restaurants = () => {
         ))}
       </Grid>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={!isGeolocationEnabled}
-      >
-        <Alert severity="error">
-          <AlertTitle>Location required</AlertTitle>
-          This application requires user <strong>location</strong>
-        </Alert>
-      </Snackbar>
+      {data != null && data.length === 0 && (
+        <Message message="No restaurants found" />
+      )}
 
       {isError && <Alert severity="error">{error?.message}</Alert>}
     </Stack>
