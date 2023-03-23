@@ -1,9 +1,16 @@
 import { useState } from "react";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Restaurants from "./views/Restaurants";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Restaurants />,
+  },
+]);
 
 const App = () => {
-  const [count, setCount] = useState(0);
-
-  return <div></div>;
+  return <RouterProvider router={router} />;
 };
 
 export default App;

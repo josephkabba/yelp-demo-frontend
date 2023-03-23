@@ -1,7 +1,7 @@
 import axios from "axios";
-const BASE_URL = "http:localhost:8080/";
+const BASE_URL = "http://localhost:8080";
 
-interface Restaurant {
+export interface Restaurant {
   id: string;
   name: string;
   location: Location;
@@ -23,11 +23,10 @@ interface Location {
   state: string;
   zip: string;
 }
-
-interface SearchRestaurantsQueryParams {
+export type SearchRestaurantsQueryParams = {
   term: string;
   location: string;
-}
+};
 
 export const searchRestaurants = async (
   queryParams: SearchRestaurantsQueryParams

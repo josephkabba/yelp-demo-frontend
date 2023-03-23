@@ -1,35 +1,44 @@
 import { useState } from "react";
-import { AxiosError, AxiosResponse } from "axios";
 
-type MutationFunction<T> = (variables: T) => Promise<AxiosResponse<any>>;
-type MutationResult<T> = {
+type MutationFunction<T> = (variables: T) => Promise<any>;
+type MutationResult<T, R> = {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
-  error: AxiosError | null;
+  data: R | null;
+  error: Error | null;
   mutate: (variables: T) => void;
 };
 
-function useMutation<T>(mutationFunction: MutationFunction<T>): MutationResult<T> {
+function useMutation<T, R>(
+  mutationFunction: MutationFunction<T>
+): MutationResult<T, R> {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<AxiosError | null>(null);
+  const [data, setData] = useState<R | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const mutate = async (variables: T) => {
     setIsLoading(true);
     try {
-      await mutationFunction(variables);
+      const response = await mutationFunction(variables);
+      setData(response.data);
+      console.log(data);
       setIsSuccess(true);
+      setIsError(false);
+      setError(null);
     } catch (error) {
       setIsError(true);
-      setError(error as AxiosError);
+      setIsSuccess(false);
+      setData(null);
+      setError(error as Error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { isLoading, isSuccess, isError, error, mutate };
+  return { isLoading, data, isSuccess, isError, error, mutate };
 }
 
 export default useMutation;

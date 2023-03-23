@@ -1,25 +1,34 @@
 import { useState, useEffect } from "react";
-import { AxiosResponse, AxiosError } from "axios";
 
-type QueryFunction<T> = () => Promise<AxiosResponse<T>>;
-type QueryResult<T> = {
-  data: T | null;
-  error: AxiosError | null;
+type QueryFunction<T> = () => Promise<any>;
+type QueryResult<T, R> = {
   isLoading: boolean;
+  isSuccess: boolean;
+  isError: boolean;
+  data: R | null;
+  error: Error | null;
 };
 
-function useQuery<T>(queryFunction: QueryFunction<T>): QueryResult<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<AxiosError | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+function useQuery<T, R>(queryFunction: QueryFunction<R>): QueryResult<T, R> {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [data, setData] = useState<R | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const response = await queryFunction();
       setData(response.data);
+      setIsSuccess(true);
+      setIsError(false);
+      setError(null);
     } catch (error) {
-      setError(error as AxiosError);
+      setIsError(true);
+      setIsSuccess(false);
+      setData(null);
+      setError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -29,7 +38,7 @@ function useQuery<T>(queryFunction: QueryFunction<T>): QueryResult<T> {
     fetchData();
   }, [queryFunction]);
 
-  return { data, error, isLoading };
+  return { data, error, isError, isSuccess, isLoading };
 }
 
 export default useQuery;
