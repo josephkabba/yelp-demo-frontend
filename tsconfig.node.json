@@ -5,5 +5,6 @@
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts"]
+  "exclude": ["./src/tests/**", "./src/__mocks__/**", "./src/test-utils"],
+  "include": ["vite.config.ts", "./tsconfig"]
 }

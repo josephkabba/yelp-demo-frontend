@@ -104,6 +104,7 @@ const Restaurants = (): JSX.Element => {
           loading={isLoading}
           variant="contained"
           type="submit"
+          id="search-button"
           startIcon={<SearchIcon />}
         >
           Search

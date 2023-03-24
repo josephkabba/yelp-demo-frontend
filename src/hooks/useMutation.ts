@@ -24,7 +24,6 @@ function useMutation<T, R>(
     try {
       const response = await mutationFunction(variables);
       setData(response.data);
-      console.log(data);
       setIsSuccess(true);
       setIsError(false);
       setError(null);

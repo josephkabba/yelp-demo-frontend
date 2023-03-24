@@ -36,7 +36,7 @@ function useQuery<R>(queryFunction: QueryFunction): QueryResult<R> {
 
   useEffect(() => {
     fetchData();
-  }, [queryFunction]);
+  }, []);
 
   return { data, error, isError, isSuccess, isLoading };
 }
