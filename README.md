@@ -33,7 +33,7 @@ The following scripts are available in the `package.json` file:
 {
   "scripts": {
     "dev": "vite",
-    "test": "NODE_ENV=test jest",
+    "test": "jest",
     "build": "tsc -p tsconfig.node.json && vite build",
     "preview": "vite preview"
   }

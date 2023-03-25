@@ -9,6 +9,7 @@ type QueryResult<R> = {
   error: Error | null;
 };
 
+
 function useQuery<R>(queryFunction: QueryFunction): QueryResult<R> {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
