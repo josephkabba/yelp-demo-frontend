@@ -1,13 +1,39 @@
-import { Grid, Paper, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Paper, Typography } from "@mui/material";
 import useQuery from "../hooks/useQuery";
 import { Restaurant, getRestaurant } from "../api/restaurants";
 import { useParams } from "react-router-dom";
+import Message from "../components/Message";
 
-const RestaurantDetail = () => {
+const RestaurantDetail = (): JSX.Element => {
   let { restaurantId } = useParams();
-  const { data: restaurant } = useQuery<Restaurant>(() => {
+  const {
+    data: restaurant,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<Restaurant>(() => {
     return getRestaurant(restaurantId || "");
   });
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return <Message message={error?.message || ""} />;
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
